@@ -1,0 +1,49 @@
+# Import the necessary libraries
+import tkinter as tk
+import RPi.GPIO as GPIO
+
+# Set the GPIO mode to BOARD (physical pin numbering)
+GPIO.setmode(GPIO.BOARD)
+
+# Define GPIO pin numbers for red, green, and blue LEDs
+led_pins = [11, 13, 15]
+
+# Initialize GPIO settings for LEDs
+GPIO.setwarnings(False)
+GPIO.setup(led_pins, GPIO.OUT)
+
+# Function to turn off all LEDs
+def turnOffLEDs():
+    GPIO.output(led_pins, GPIO.LOW)
+
+# Function to turn on a specific LED
+def turnOnLED(pin):
+    turnOffLEDs()  # First, turn off all LEDs
+    GPIO.output(pin, GPIO.HIGH)  # Then, turn on the specified LED
+
+# Function to clean up GPIO and close the tkinter window
+def cleanupAndExit():
+    turnOffLEDs()  # Turn off all LEDs before cleanup
+    GPIO.cleanup()  # Clean up GPIO resources
+    window.destroy()  # Close the tkinter window
+
+# Create the tkinter window
+window = tk.Tk()
+window.title('LED Control')
+
+# Create buttons to control LEDs
+colors = [('Red', 'red', led_pins[0]),
+          ('Green', 'green', led_pins[1]),
+          ('Blue', 'blue', led_pins[2])]
+
+# Create buttons for each color
+for color, bg_color, pin in colors:
+    button = tk.Button(window, text=f'Turn On {color} LED', command=lambda p=pin: turnOnLED(p), bg=bg_color, height=1, width=50)
+    button.pack()
+
+# Create an exit button to clean up GPIO and close the window
+exit_button = tk.Button(window, text='Exit', command=cleanupAndExit, bg='grey', height=1, width=50)
+exit_button.pack()
+
+# Start the tkinter main loop
+window.mainloop()
